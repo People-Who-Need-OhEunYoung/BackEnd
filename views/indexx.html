@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>시작</title>
+</head>
+<body>
+    <h1>반갑습니다</h1>
+    <form>
+        ID : <input type="text" name="id" id="id"><br>
+        PW : <input type="password" name="pw" id="pw"><br>
+        <button type="button" onclick="login()">로그인</button>
+    </form>
+
+
+    <form>
+        <button type="button" onclick="tokenTest()">토큰검증테스트</button>
+    </form>
+    
+    <form>
+        <button type="button" onclick="viewProblem()">채점 가능한 문제 보기</button>
+    </form>
+    <div id="propro" style="margin-top: 20px; border: 1px solid #ccc; padding: 10px;">
+    </div>
+    
+    <p>
+        <form>
+            <textarea id="code" name="code" rows="4" cols="50" placeholder="코드를 입력하세요!"></textarea><br>
+            문제번호 : <input type="text" name="bojNumber" id="bojNumber"><br>
+            <button type="button" onclick="runCode()">코드 제출</button>
+        </form>
+    </p>
+    <p>
+        <button onclick="window.location.href='/aiTest'">AI Test</button>
+    </p>
+
+    <hr>
+    <div id="output" style="margin-top: 20px; border: 1px solid #ccc; padding: 10px;"></div>
+
+    
+    <script>
+        function viewProblem() {
+            const token = localStorage.getItem('token'); // 토큰 가져오기
+            
+            fetch('/viewProblem', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const outputDiv = document.querySelector('#propro');
+                if(data.result === 'success') {
+                    outputDiv.textContent = `${data.data}`;
+                }
+                else {
+                    outputDiv.textContent = `${data.data}`
+                }
+            })
+            .catch(error => {
+                console.error('에러:', error);
+            });
+        }
+
+
+        function runCode() {
+            const code = document.querySelector('#code').value; // 사용자 코드 가져오기
+            const bojNumber = document.querySelector('#bojNumber').value;
+            const token = localStorage.getItem('token'); // 토큰 가져오기
+
+            fetch('/runCode', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+		        body: JSON.stringify({code: code, bojNumber: bojNumber})
+            })
+            .then(response => response.json())
+            .then(data => {
+                const outputDiv = document.querySelector('#output');
+                if(data.result === 'success') {
+                    outputDiv.textContent = `${data.data}`;
+                }
+                else {
+                    outputDiv.textContent = `${data.data}`
+                }
+            })
+            .catch(error => {
+                console.error('에러:', error);
+            });
+        }
+
+
+        function tokenTest() {
+            const token = localStorage.getItem('token');
+
+            fetch('/tokenTest', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.result === 'success') {
+                    alert(`토큰 검증 성공!!\n게시글 출력 : ${data.data}`);
+                }
+                else {
+                    alert('토큰 검증 실패');
+                }
+            })
+            .catch(error => {
+                console.error('Error: ', error);
+            })
+        }
+
+
+
+
+
+        function login() {
+            const id = document.querySelector('#id').value;
+            const pw = document.querySelector('#pw').value;
+
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({id: id, pw: pw})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.result === 'success') {
+                    console.log(data.id);
+                    console.log(data.pw);
+
+                    // 토큰 셋팅
+                    localStorage.setItem('token', data.token);
+                    alert(`id: ${data.id}, pw: ${data.pw}\n수신 완료`);
+                }
+                else {
+                    console.log('fail');
+                    alert(`id 또는 pw가 틀렸습니다.`);
+                }
+            })
+            .catch(error => {
+                console.error('Error: ', error);
+            });
+        }
+    </script>
+</body>
+</html>

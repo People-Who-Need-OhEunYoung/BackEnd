@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>POKE CODE</title>
+    <style>
+      /* title, favicon, style 태그 */
+      @keyframes float {
+        0% {
+          transform: translate3d(0, -25px, 0);
+          transform: scale(0.5);
+          left: -150%;
+        }
+        100% {
+          transform: translate3d(0, -25px, 0);
+          transform: scale(1.5);
+          left: 150%;
+        }
+      }
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      ul,
+      ol {
+        list-style: none;
+      }
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+      body {
+        width: 100%;
+        height: 100vh;
+        position: relative;
+        background: #9073ba;
+        overflow: hidden;
+      }
+      .one {
+        /* Ellipse 6 */
+        position: absolute;
+        width: 1000px;
+        height: 861px;
+        left: 474px;
+        top: 640px;
+        background: #ff89ff;
+        filter: opacity(0.8);
+        filter: blur(1000px);
+        border-radius: 100%;
+        animation: float 7s ease-in-out infinite;
+      }
+      .two {
+        /* Ellipse 8 */
+        position: absolute;
+        width: 893px;
+        height: 826px;
+        left: 1447px;
+        top: -243px;
+        background: #c9bf66;
+        filter: opacity(0.8);
+        filter: blur(1000px);
+        border-radius: 100%;
+        animation: float 6s ease-in-out infinite reverse;
+      }
+      .three {
+        /* Ellipse 7 */
+        position: absolute;
+        width: 966px;
+        height: 997px;
+        left: -320px;
+        top: 344px;
+        background: #416aff;
+        filter: opacity(0.8);
+        filter: blur(1000px);
+        border-radius: 100%;
+        animation: float 9s ease-in-out infinite;
+      }
+    </style>
+    <script type="module" crossorigin src="/assets/index-DEUVVKVM.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-DgDgs1Yh.css">
+  </head>
+  <body>
+    <div
+      style="
+        overflow: hidden;
+        width: 100%;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: -1;
+      "
+    >
+      <div class="one"></div>
+      <div class="two"></div>
+      <div class="three"></div>
+    </div>
+    <div id="root"></div>
+  </body>
+</html>
