@@ -8,7 +8,7 @@ const secretKey = '1234';
 const { exec } = require('child_process');  // app.js가 있는 경로를 기준으로 실행된다
 const https = require('follow-redirects').https;
 const path = require('path');
-
+//
 var db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
