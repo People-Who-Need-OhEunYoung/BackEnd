@@ -75,27 +75,24 @@ app.post('/runCode', (req, res) => {
         const code = req.body.code;
         const bojNumber = req.body.bojNumber;
 
-        // 받은 코드를 저장한 후 그걸 실행하기 -> 다중 사용자는 어떻게???
-        // 파일명 : 사용자id_문제번호
 
-        exec(`./codeCompare.sh "${code}" ${bojNumber}`, (error, stdout, stderr) => {
+        // 사용자 코드 저장 : 사용자id_문제번호 1234_3055
+        exec(`echo "${code.replace(/"/g, '\\"')}" > userCode/${decoded.id}_${bojNumber}`, (error, stdout, stderr) => {
             if(error) {
-                console.error(`파이썬 실행 에러: ${error}`);
+                console.error(`사용자 코드 저장 실패: ${error}`);
                 res.json({result : 'fail', data : `${error}`});
                 return;
             }
             
-            res.json({result : 'success', data : `${stdout}`});
-        });
-
-        exec(`./codeCompare.sh "${code}" ${bojNumber}`, (error, stdout, stderr) => {
-            if(error) {
-                console.error(`파이썬 실행 에러: ${error}`);
-                res.json({result : 'fail', data : `${error}`});
-                return;
-            }
-            
-            res.json({result : 'success', data : `${stdout}`});
+            exec(`./codeCompare.sh ${decoded.id}_${bojNumber} ${bojNumber}`, (error, stdout, stderr) => {
+                if(error) {
+                    console.error(`파이썬 실행 에러: ${error}`);
+                    res.json({result : 'fail', data : `${error}`});
+                    return;
+                }
+                
+                res.json({result : 'success', data : `${stdout}`});
+            });
         });
     });
 });

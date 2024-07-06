@@ -18,11 +18,13 @@
         <button type="button" onclick="tokenTest()">토큰검증테스트</button>
     </form>
     
-    <form>
-        <button type="button" onclick="viewProblem()">채점 가능한 문제 보기</button>
-    </form>
-    <div id="propro" style="margin-top: 20px; border: 1px solid #ccc; padding: 10px;">
-    </div>
+    <p>
+        <form>==========
+            <button type="button" onclick="viewProblem()">채점 가능한 문제 보기</button>==========
+        </form>
+        <div id="propro" style="margin-top: 20px; border: 1px solid #ccc; padding: 10px;">
+        </div>
+    </p>
     
     <p>
         <form>
@@ -42,7 +44,7 @@
     <script>
         function viewProblem() {
             const token = localStorage.getItem('token'); // 토큰 가져오기
-            
+
             fetch('/viewProblem', {
                 method: 'POST',
                 headers: {
