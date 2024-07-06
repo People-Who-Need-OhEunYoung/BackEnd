@@ -8,7 +8,7 @@ const secretKey = '1234';
 const { exec } = require('child_process');  // app.js가 있는 경로를 기준으로 실행된다
 const https = require('follow-redirects').https;
 const path = require('path');
-//
+
 var db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
@@ -17,137 +17,29 @@ var db = mysql.createConnection({
     });
 db.connect();
 
-// app.set('view engine', 'html');  // view engine : 템플릿 엔진 선택 키
-// app.set('views', './views'); // views : 템플릿 파일 디렉터리 선택 키
 app.use(bodyParser.urlencoded({extended: true})); // post body 데이터 받아오기 위함
-// JSON 본문 파싱을 위한 미들웨어
 app.use(express.json());
-
 app.use(express.static(path.join(__dirname, 'views')));
 
-app.get('/sunkue', (req, res) => {
-    // res.render('indexx.html');
-    res.sendFile(path.join(__dirname, 'views', 'indexx.html'));
-});
 
-app.post('/viewProblem', (req, res) => {
 
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
+////////////////////////////////////////////////// API 시작 ////////////////////////////////////////////////
 
-    // jwt 토큰 복호화
-    jwt.verify(token, secretKey, (error, decoded) => {
-        if(error) {
-            return res.json({result : 'fail'})
-        }
-        console.log(`토큰 검증 완료, 사용자 id : ${decoded.id}`)
-
-        exec(`ls /home/ubuntu/nodejs/pokecode/testCase`, (error, stdout, stderr) => {
-            if(error) {
-                console.error(`문제 조회 에러: ${error}`);
-                res.json({result : 'fail', data : `${error}`});
-                return;
-            }
-            
-            res.json({result : 'success', data : `${stdout}`});
-        });
-    });  
-});
-//
-
+// 프론트에서 만든 리액트 페이지들
 app.get('/', (req, res) => {
     // res.render('index');  // ./views/index.ejs 리턴
     res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
 
-app.post('/runCode', (req, res) => {
 
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-
-    // jwt 토큰 복호화
-    jwt.verify(token, secretKey, (error, decoded) => {
-        if(error) {
-            return res.json({result : 'fail'})
-        }
-        console.log(`토큰 검증 완료, 사용자 id : ${decoded.id}`)
-
-        const code = req.body.code;
-        const bojNumber = req.body.bojNumber;
-
-        // 받은 코드를 저장한 후 그걸 실행하기 -> 다중 사용자는 어떻게???
-        // 파일명 : 사용자id_문제번호
-
-        exec(`./codeCompare.sh "${code}" ${bojNumber}`, (error, stdout, stderr) => {
-            if(error) {
-                console.error(`파이썬 실행 에러: ${error}`);
-                res.json({result : 'fail', data : `${error}`});
-                return;
-            }
-            
-            res.json({result : 'success', data : `${stdout}`});
-        });
-
-        exec(`./codeCompare.sh "${code}" ${bojNumber}`, (error, stdout, stderr) => {
-            if(error) {
-                console.error(`파이썬 실행 에러: ${error}`);
-                res.json({result : 'fail', data : `${error}`});
-                return;
-            }
-            
-            res.json({result : 'success', data : `${stdout}`});
-        });
-    });
+// 내가 만든 백 로직 테스트 페이지
+app.get('/sunkue', (req, res) => {
+    // res.render('indexx.html');
+    res.sendFile(path.join(__dirname, 'views', 'indexx.html'));
 });
 
 
-// JWT 토큰 형태
-// {
-//     type: 'JWT',
-//     id: '1234',
-//     iat: 1719493812,
-//     exp: 1719495612,
-//     iss: 'ysk'
-//   }
-
-app.post('/sendCode', (req, res) => {
-    
-    const code = req.body.code;
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-
-    // jwt 토큰 복호화
-    jwt.verify(token, secretKey, (error, decoded) => {
-        if(error) {
-            return res.json({result : 'fail'})
-        }
-        console.log(`토큰 검증 완료, 사용자 id : ${decoded.id}`)
-    });
-
-
-})
-
-
-// 토큰 검증 api
-app.post('/tokenTest', (req, res) => {
-    const authHeader = req.headers['authorization'];
-
-    // authHeader가 있는지 확인 후 split 실행한다
-    // split : ['Bearer', 'abcdefg...'] 로 분리되어 토큰만 추출한다
-    const token = authHeader && authHeader.split(' ')[1];
-    
-    // jwt 토큰 복호화
-    jwt.verify(token, secretKey, (error, decoded) => {
-        if(error) {
-            return res.json({result : 'fail'})
-        }
-        console.log(`토큰 검증 완료, 사용자 id : ${decoded.id}`) 
-    });
-
-    return res.json({result : 'success', data : '게시글1111'})
-
-})
-
+// 로그인
 app.post('/login', (request, response) => {
     const id = request.body.id;
     const pw = request.body.pw;
@@ -175,41 +67,80 @@ app.post('/login', (request, response) => {
             response.json({result : 'fail'});
         }    
     })
-  
-    // let sql = `SELECT * FROM author WHERE name=?`;
-    // db.query(sql, [id], function(error, result){
-    //     if(error) {
-    //         return response.status(500).json({error: 'Database query failed'});
-    //     }
-    //     // 이미 존재하는 id일 경우
-    //     if(result.length !== 0) {
-    //         return response.render('signup', { message: '이미 존재하는 ID입니다'});
-    //     }
-    //     // 회원가입 가능할 경우
-    //     else {
-    //         sql = `INSERT INTO author(name, profile, password) VALUES(?, ?, ?)`;
-    //         db.query(sql, [id, profile, pw], function(error, result){
-    //             if(error) {
-    //                 return response.status(500).json({error: 'Database query failed'});
-    //             }
-    //             // 회원가입에 성공했을 경우
-    //             if(result.affectedRows === 1) {
-    //                 return response.send(`<script>alert('회원가입 성공!'); location.href='/';</script>`)
-    //             }
-    //         });
-    //     }
-    // });
 });
 
 
+// 채점 가능한 문제 보기
+app.post('/viewProblem', (req, res) => {
+
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    // jwt 토큰 복호화
+    jwt.verify(token, secretKey, (error, decoded) => {
+        if(error) {
+            return res.json({result : 'fail'})
+        }
+        console.log(`토큰 검증 완료, 사용자 id : ${decoded.id}`)
+
+        exec(`ls /home/ubuntu/nodejs/pokecode/testCase`, (error, stdout, stderr) => {
+            if(error) {
+                console.error(`문제 조회 에러: ${error}`);
+                res.json({result : 'fail', data : `${error}`});
+                return;
+            }
+            
+            res.json({result : 'success', data : `${stdout}`});
+        });
+    });  
+});
 
 
+// 코드 채점
+app.post('/runCode', (req, res) => {
+
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    // jwt 토큰 복호화
+    jwt.verify(token, secretKey, (error, decoded) => {
+        if(error) {
+            return res.json({result : 'fail'})
+        }
+        console.log(`토큰 검증 완료, 사용자 id : ${decoded.id}`)
+
+        const code = req.body.code;
+        const bojNumber = req.body.bojNumber;
+
+
+        // 사용자 코드 저장 : 사용자id_문제번호 1234_3055
+        exec(`echo "${code.replace(/"/g, '\\"')}" > userCode/${decoded.id}_${bojNumber}`, (error, stdout, stderr) => {
+            if(error) {
+                console.error(`사용자 코드 저장 실패: ${error}`);
+                res.json({result : 'fail', data : `${error}`});
+                return;
+            }
+            
+            exec(`./codeCompare.sh ${decoded.id}_${bojNumber} ${bojNumber}`, (error, stdout, stderr) => {
+                if(error) {
+                    console.error(`파이썬 실행 에러: ${error}`);
+                    res.json({result : 'fail', data : `${error}`});
+                    return;
+                }
+                
+                res.json({result : 'success', data : `${stdout}`});
+            });
+        });
+    });
+});
+
+
+////////////////////////////////////////////////// deepseek AI ////////////////////////////////////////////////
 app.get('/aiTest', function (req, res) {
     console.log('deepseek테스트 들어옴');
     callApi();
     // console.log( callChatGPT('안녕, 너 몇살이니?') );
 });
-
 
 // 스트리밍 성공. 바닐라버전임
 function callApi() {
@@ -296,7 +227,7 @@ function callApi() {
     req.write(postData); // POST 데이터 쓰기
     req.end(); // 요청 종료
 }
-
+////////////////////////////////////////////////// deepseek AI ////////////////////////////////////////////////
 
 
 

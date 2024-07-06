@@ -1,11 +1,12 @@
 #!/bin/bash
-# $1 -> 사용자 코드
+# $1 -> 사용자 코드 파일명
 # $2 -> 문제번호
-#
+
 
 result=""
 i=1
 inputPath="/home/ubuntu/nodejs/pokecode/testCase/$2"
+userCodePath="/home/ubuntu/nodejs/pokecode/userCode/$1"
 
 # 디렉터리 존재여부 확인(문제번호 존재여부 확인)
 if [ ! -d "$inputPath" ]; then
@@ -19,7 +20,7 @@ for inputdata in "$inputPath"/inputdata*; do
 		
         outputdata="/home/ubuntu/nodejs/pokecode/testCase/$2/outputdata$i"
 		
-        userResult=$(python3.11 -c "$1" < "$inputdata" 2>&1) # 사용자 코드 실행
+        userResult=$(python3.11 "$userCodePath" < "$inputdata" 2>&1) # 사용자 코드 실행
 		exitCode=$?
 
 		# 실행 중 오류났으면 오류메시지 출력
