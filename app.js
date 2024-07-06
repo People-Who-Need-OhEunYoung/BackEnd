@@ -70,6 +70,23 @@ app.post('/login', (request, response) => {
 });
 
 
+// 토큰 검증
+app.post('/tokenTest', (req, res) => {
+
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    // jwt 토큰 복호화
+    jwt.verify(token, secretKey, (error, decoded) => {
+        if(error) {
+            return res.json({result : 'fail'})
+        }
+        console.log(`토큰 검증 완료, 사용자 id : ${decoded.id}`)
+        res.json({result : 'success'});
+    });
+});
+
+
 // 채점 가능한 문제 보기
 app.post('/viewProblem', (req, res) => {
 
