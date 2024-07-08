@@ -611,4 +611,4 @@ function callApi() {
 server.listen(process.env.PORT || 44444, () => {
     console.log(process.env.PORT)
     console.log(`Server running on port:${process.env.PROFILE}`);
-})
+});
