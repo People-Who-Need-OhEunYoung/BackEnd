@@ -1,15 +1,27 @@
 const express = require('express');
+// 실시간 협업 에디터
+const WebSocket = require('ws');
+const http = require('http');
+const { setupWSConnection } = require('y-websocket/bin/utils');
+
 const app = express();
 const bodyParser = require('body-parser');
 const mysql = require('mysql2');
 const jwt = require('jsonwebtoken');
 const secretKey = '1234';
 const { exec } = require('child_process');  // app.js가 있는 경로를 기준으로 실행된다
-const https = require('follow-redirects').https;
+//const https = require('follow-redirects').https;
 const path = require('path');
+// 실시간 협업 에디터
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
+
+wss.on('connection', (ws, req) => {
+    setupWSConnection(ws, req);
+});
 
 var db = mysql.createConnection({
-    host: 'localhost',
+    host: 'ubuntu',
     user: 'root',
     password: '',
     database: 'practice'
@@ -102,7 +114,6 @@ app.post('/runCode', (req, res) => {
     });
 });
 
-
 // JWT 토큰 형태
 // {
 //     type: 'JWT',
@@ -177,30 +188,6 @@ app.post('/login', (request, response) => {
             response.json({result : 'fail'});
         }    
     })
-  
-    // let sql = `SELECT * FROM author WHERE name=?`;
-    // db.query(sql, [id], function(error, result){
-    //     if(error) {
-    //         return response.status(500).json({error: 'Database query failed'});
-    //     }
-    //     // 이미 존재하는 id일 경우
-    //     if(result.length !== 0) {
-    //         return response.render('signup', { message: '이미 존재하는 ID입니다'});
-    //     }
-    //     // 회원가입 가능할 경우
-    //     else {
-    //         sql = `INSERT INTO author(name, profile, password) VALUES(?, ?, ?)`;
-    //         db.query(sql, [id, profile, pw], function(error, result){
-    //             if(error) {
-    //                 return response.status(500).json({error: 'Database query failed'});
-    //             }
-    //             // 회원가입에 성공했을 경우
-    //             if(result.affectedRows === 1) {
-    //                 return response.send(`<script>alert('회원가입 성공!'); location.href='/';</script>`)
-    //             }
-    //         });
-    //     }
-    // });
 });
 
 
@@ -211,7 +198,6 @@ app.get('/aiTest', function (req, res) {
     callApi();
     // console.log( callChatGPT('안녕, 너 몇살이니?') );
 });
-
 
 // 스트리밍 성공. 바닐라버전임
 function callApi() {
