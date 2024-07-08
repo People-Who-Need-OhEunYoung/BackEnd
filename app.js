@@ -2,7 +2,6 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 const bodyParser = require('body-parser');
-const port = 3000;
 const mysql = require('mysql2');
 const jwt = require('jsonwebtoken');
 const secretKey = '1234';
@@ -44,6 +43,13 @@ app.get('/', (req, res) => {
 
 
 // 내가 만든 백 로직 테스트 페이지
+
+// 무중단 배포 서버 프로필 확인 (check status)
+app.get('/status',(req,res)=>{
+    const serverProfile = process.env.PROFILES || 'No color set'
+    res.status(200).send(`${serverProfile}`);
+})
+
 app.get('/sunkue', (req, res) => {
     // res.render('indexx.html');
     res.sendFile(path.join(__dirname, 'views', 'indexx.html'));
@@ -179,6 +185,7 @@ app.post('/signUp', (req, res) => {
         }
     });
 
+
     // 닉네임 중복검사
     sql = `SELECT * FROM user WHERE nick_name=?`;
     db.query(sql, [nickName], function(error, result) {
@@ -262,6 +269,25 @@ app.post('/myPage', (req, res) => {
                     credit : row.credit,
                     curPokeId : row.cur_poke_id,
                     resolvedCount : count});
+
+
+        // 사용자 코드 저장 : 사용자id_문제번호 1234_3055
+        exec(`echo "${code.replace(/"/g, '\\"')}" > userCode/${decoded.id}_${bojNumber}`, (error, stdout, stderr) => {
+            if(error) {
+                console.error(`사용자 코드 저장 실패: ${error}`);
+                res.json({result : 'fail', data : `${error}`});
+                return;
+            }
+            
+            exec(`./codeCompare.sh ${decoded.id}_${bojNumber} ${bojNumber}`, (error, stdout, stderr) => {
+                if(error) {
+                    console.error(`파이썬 실행 에러: ${error}`);
+                    res.json({result : 'fail', data : `${error}`});
+                    return;
+                }
+                
+                res.json({result : 'success', data : `${stdout}`});
+
             });
         });
     });
@@ -571,9 +597,7 @@ function callApi() {
 }
 ////////////////////////////////////////////////// deepseek AI ////////////////////////////////////////////////
 
-
-
-
-app.listen(port, () => {
-    console.log(`Server running... port: ${port}`);
+server.listen(process.env.PORT || 44444, () => {
+    console.log(process.env.PORT)
+    console.log(`Server running on port:${process.env.PROFILE}`);
 });
