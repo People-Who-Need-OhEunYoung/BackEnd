@@ -13,11 +13,6 @@
         <button type="button" onclick="login()">로그인</button>
     </form>
 
-
-    <form>
-        <button type="button" onclick="tokenTest()">토큰검증테스트</button>
-    </form>
-    
     <p>
         <form>==========
             <button type="button" onclick="viewProblem()">채점 가능한 문제 보기</button>==========
@@ -25,6 +20,7 @@
         <div id="propro" style="margin-top: 20px; border: 1px solid #ccc; padding: 10px;">
         </div>
     </p>
+
     
     <p>
         <form>
@@ -43,6 +39,7 @@
     
     <script>
         function viewProblem() {
+
             const token = localStorage.getItem('token'); // 토큰 가져오기
 
             fetch('/viewProblem', {
@@ -66,7 +63,6 @@
                 console.error('에러:', error);
             });
         }
-
 
         function runCode() {
             const code = document.querySelector('#code').value; // 사용자 코드 가져오기
@@ -96,35 +92,6 @@
             });
         }
 
-
-        function tokenTest() {
-            const token = localStorage.getItem('token');
-
-            fetch('/tokenTest', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.result === 'success') {
-                    alert(`토큰 검증 성공!!\n게시글 출력 : ${data.data}`);
-                }
-                else {
-                    alert('토큰 검증 실패');
-                }
-            })
-            .catch(error => {
-                console.error('Error: ', error);
-            })
-        }
-
-
-
-
-
         function login() {
             const id = document.querySelector('#id').value;
             const pw = document.querySelector('#pw').value;
@@ -140,11 +107,10 @@
             .then(data => {
                 if(data.result === 'success') {
                     console.log(data.id);
-                    console.log(data.pw);
 
                     // 토큰 셋팅
                     localStorage.setItem('token', data.token);
-                    alert(`id: ${data.id}, pw: ${data.pw}\n수신 완료`);
+                    alert(`id: ${data.id}\n수신 완료`);
                 }
                 else {
                     console.log('fail');
