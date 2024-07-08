@@ -29,10 +29,6 @@ function getRandomNumber(min, max) {
 }
 
 
-
-
-
-
 ////////////////////////////////////////////////// API 시작 ////////////////////////////////////////////////
 
 // 프론트에서 만든 리액트 페이지들
@@ -269,6 +265,27 @@ app.post('/myPage', (req, res) => {
                     credit : row.credit,
                     curPokeId : row.cur_poke_id,
                     resolvedCount : count});
+            });
+        });
+    });
+});
+
+
+
+    app.post('/runCode', (req, res) => {
+
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    // jwt 토큰 복호화
+    jwt.verify(token, secretKey, (error, decoded) => {
+        if(error) {
+            return res.json({result : 'fail'})
+        }
+        console.log(`토큰 검증 완료, 사용자 id : ${decoded.id}`)
+
+        const code = req.body.code;
+        const bojNumber = req.body.bojNumber;
 
 
         // 사용자 코드 저장 : 사용자id_문제번호 1234_3055
@@ -287,11 +304,11 @@ app.post('/myPage', (req, res) => {
                 }
                 
                 res.json({result : 'success', data : `${stdout}`});
-
             });
         });
     });
 });
+        
 
 
 // 6. 도감 출력 => 완성
@@ -598,6 +615,6 @@ function callApi() {
 ////////////////////////////////////////////////// deepseek AI ////////////////////////////////////////////////
 
 server.listen(process.env.PORT || 44444, () => {
-    console.log(process.env.PORT)
+    console.log(process.env.PORT);
     console.log(`Server running on port:${process.env.PROFILE}`);
 });
