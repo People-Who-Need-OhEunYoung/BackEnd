@@ -1,7 +1,6 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-const port = 3000;
 const mysql = require('mysql2');
 const jwt = require('jsonwebtoken');
 const secretKey = '1234';
@@ -24,6 +23,12 @@ app.use(bodyParser.urlencoded({extended: true})); // post body 데이터 받아�
 app.use(express.json());
 
 app.use(express.static(path.join(__dirname, 'views')));
+
+// 무중단 배포 서버 프로필 확인 (check status)
+app.get('/status',(req,res)=>{
+    const serverProfile = process.env.PROFILES || 'No color set'
+    res.status(200).send(`${serverProfile}`);
+})
 
 app.get('/sunkue', (req, res) => {
     // res.render('indexx.html');
@@ -295,9 +300,7 @@ function callApi() {
 }
 
 
-
-
-
-app.listen(port, () => {
-    console.log(`Server running... port: ${port}`);
+server.listen(process.env.PORT || 44444, () => {
+    console.log(process.env.PORT)
+    console.log(`Server running on port:${process.env.PROFILE}`);
 });
