@@ -1,13 +1,25 @@
 const express = require('express');
 const cors = require('cors');
+// 실시간 협업 에디터
+const WebSocket = require('ws');
+const http = require('http');
+const { setupWSConnection } = require('y-websocket/bin/utils');
+
 const app = express();
 const bodyParser = require('body-parser');
 const mysql = require('mysql2');
 const jwt = require('jsonwebtoken');
 const secretKey = '1234';
 const { exec } = require('child_process');  // app.js가 있는 경로를 기준으로 실행된다
-const https = require('follow-redirects').https;
+//const https = require('follow-redirects').https;
 const path = require('path');
+// 실시간 협업 에디터
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
+
+wss.on('connection', (ws, req) => {
+    setupWSConnection(ws, req);
+});
 const crypto = require('crypto');
 
 var db = mysql.createConnection({
@@ -519,7 +531,6 @@ app.post('/runCode', (req, res) => {
         });
     });
 });
-
 
 ////////////////////////////////////////////////// deepseek AI ////////////////////////////////////////////////
 app.get('/aiTest', function (req, res) {
