@@ -103,11 +103,10 @@
             .then(data => {
                 if(data.result === 'success') {
                     console.log(data.id);
-                    console.log(data.pw);
 
                     // 토큰 셋팅
                     localStorage.setItem('token', data.token);
-                    alert(`id: ${data.id}, pw: ${data.pw}\n수신 완료`);
+                    alert(`id: ${data.id}\n수신 완료`);
                 }
                 else {
                     console.log('fail');
