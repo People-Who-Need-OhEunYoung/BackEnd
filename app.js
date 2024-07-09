@@ -3,6 +3,8 @@ const cors = require('cors');
 // 실시간 협업 에디터
 const WebSocket = require('ws');
 const http = require('http');
+const dotenv = require('dotenv');
+dotenv.config();
 const { setupWSConnection } = require('y-websocket/bin/utils');
 
 const app = express();
@@ -23,9 +25,9 @@ wss.on('connection', (ws, req) => {
 const crypto = require('crypto');
 
 var db = mysql.createConnection({
-    host: '52.79.197.126',
-    user: 'sunkue',
-    password: 'Tjsrb123!@',
+    host: process.env.IP,
+    user: process.env.USERNAME,
+    password: process.env.PASSWORD,
     database: 'myweapon'
     });
 db.connect();
@@ -44,10 +46,10 @@ function getRandomNumber(min, max) {
 ////////////////////////////////////////////////// API 시작 ////////////////////////////////////////////////
 
 // 프론트에서 만든 리액트 페이지들
-app.get('/', (req, res) => {
-    // res.render('index');  // ./views/index.ejs 리턴
-    res.sendFile(path.join(__dirname, 'views', 'index.html'));
-});
+// app.get('/', (req, res) => {
+//     // res.render('index');  // ./views/index.ejs 리턴
+//     res.sendFile(path.join(__dirname, 'views', 'index.html'));
+// });
 
 
 // 내가 만든 백 로직 테스트 페이지
@@ -625,7 +627,12 @@ function callApi() {
 }
 ////////////////////////////////////////////////// deepseek AI ////////////////////////////////////////////////
 
-server.listen(process.env.PORT || 44444, () => {
-    console.log(process.env.PORT);
-    console.log(`Server running on port:${process.env.PROFILE}`);
+
+app.post('/problem/editor',(req,res) => {
+
+});
+
+server.listen(8080, () => {
+    //console.log(8080);
+    console.log(`Server running on port:8080`);
 });
