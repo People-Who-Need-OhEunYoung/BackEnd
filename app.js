@@ -916,6 +916,7 @@ function callApi(number) {
 
 ////////////////////////////////////////////////// deepseek AI ////////////////////////////////////////////////
 
-server.listen(3000 || 44444, () => {
-    console.log(`running on port:3000`);
+server.listen(process.env.PORT || 44444, () => {
+    console.log(process.env.PORT);
+    console.log(`Server running on port:${process.env.PROFILE}`);
 });
