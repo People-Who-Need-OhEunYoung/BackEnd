@@ -9,13 +9,15 @@ const app = express();
 const bodyParser = require('body-parser');
 const mysql = require('mysql2');
 const jwt = require('jsonwebtoken');
-const secretKey = '1234';
+const secretKey = process.env.secretKey;
 const { exec } = require('child_process');  // app.js가 있는 경로를 기준으로 실행된다
 //const https = require('follow-redirects').https;
 const path = require('path');
 // 실시간 협업 에디터
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
+const dotenv = require('dotenv');
+dotenv.config();
 
 wss.on('connection', (ws, req) => {
     setupWSConnection(ws, req);
@@ -23,10 +25,10 @@ wss.on('connection', (ws, req) => {
 const crypto = require('crypto');
 
 var db = mysql.createConnection({
-    host: 'localhost',
-    user: 'sunkue',
-    password: 'Tjsrb123!@',
-    database: 'myweapon'
+    host: process.env.host,
+    user: process.env.user,
+    password: process.env.password,
+    database: process.env.database
     });
 db.connect();
 
@@ -626,6 +628,5 @@ function callApi() {
 ////////////////////////////////////////////////// deepseek AI ////////////////////////////////////////////////
 
 server.listen(process.env.PORT || 44444, () => {
-    console.log(process.env.PORT);
-    console.log(`Server running on port:${process.env.PROFILE}`);
+    console.log(`Server running on port:${process.env.PORT}`);
 });
