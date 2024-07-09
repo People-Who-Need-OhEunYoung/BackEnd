@@ -85,7 +85,7 @@ app.post('/login', (req, res) => {
 
     // SHA256 해시
     const hashPw = crypto.createHash('sha256').update(pw).digest('hex');
-    
+
     let sql = `SELECT * FROM user WHERE bakjoon_id=? AND bakjoon_pw=?`;
     db.query(sql, [id, hashPw], function(error, result) {
         if(error) {
@@ -919,7 +919,6 @@ function callApi(number) {
 
 ////////////////////////////////////////////////// deepseek AI ////////////////////////////////////////////////
 
-server.listen(process.env.PORT || 44444, () => {
-    console.log(`Server running on ${process.env.PROFILES}`);
-    console.log(`running on port:${process.env.PORT}`);
+server.listen(3000 || 44444, () => {
+    console.log(`running on port:3000`);
 });
