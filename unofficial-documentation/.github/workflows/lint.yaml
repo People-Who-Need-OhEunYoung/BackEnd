@@ -1,0 +1,23 @@
+name: Lint
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 8
+      - uses: actions/setup-node@v4
+        with:
+          cache: pnpm
+      - run: pnpm i
+      - run: pnpm build
+      - uses: stoplightio/spectral-action@v0.8.10
+        with:
+          file_glob: 'tsp-output/*.yaml'

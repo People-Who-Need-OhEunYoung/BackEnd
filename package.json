@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "start": "nodemon app",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -11,7 +12,14 @@
   "dependencies": {
     "ejs": "^3.1.10",
     "express": "^4.19.2",
+    "follow-redirects": "^1.15.6",
     "jsonwebtoken": "^9.0.2",
-    "mysql2": "^3.10.1"
+    "mysql2": "^3.10.1",
+    "cors": "^2.8.5",
+    "nodemon": "^3.1.4",
+    "path": "^0.12.7",
+    "ws": "^8.17.1",
+    "y-websocket": "^2.0.3",
+    "yjs": "^13.6.18"
   }
 }
