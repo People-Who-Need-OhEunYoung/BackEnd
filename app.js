@@ -3,8 +3,8 @@ const cors = require('cors');
 // 실시간 협업 에디터
 const WebSocket = require('ws');
 const http = require('http');
-const dotenv = require('dotenv');
-dotenv.config();
+// const dotenv = require('dotenv');
+// dotenv.config();
 const { setupWSConnection } = require('y-websocket/bin/utils');
 
 const app = express();
@@ -628,7 +628,7 @@ function callApi() {
 ////////////////////////////////////////////////// deepseek AI ////////////////////////////////////////////////
 
 
-app.post('/problem/editor',(req,res) => {
+app.post('/runCode',(req,res) => {
 
 });
 
