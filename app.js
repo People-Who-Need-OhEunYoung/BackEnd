@@ -47,7 +47,7 @@ db.connect();
 app.use(cors());
 app.use(bodyParser.urlencoded({extended: true})); // post body 데이터 받아오기 위함
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'views')));
+//app.use(express.static(path.join(__dirname, 'views')));
 
 // min ~ max 사이 숫자 중 하나를 랜덤으로 고르는 함수
 function getRandomNumber(min, max) {
