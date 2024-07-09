@@ -1,5 +1,7 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+
 // 실시간 협업 에디터
 const WebSocket = require('ws');
 const http = require('http');
@@ -9,28 +11,36 @@ const app = express();
 const bodyParser = require('body-parser');
 const mysql = require('mysql2');
 const jwt = require('jsonwebtoken');
-const secretKey = process.env.secretKey;
+const secretKey = process.env.SECRETKEY;
 const { exec } = require('child_process');  // app.js가 있는 경로를 기준으로 실행된다
-//const https = require('follow-redirects').https;
+const https = require('follow-redirects').https;
 const path = require('path');
+const crypto = require('crypto');
+
 // 실시간 협업 에디터
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
-const dotenv = require('dotenv');
-dotenv.config();
+
 
 wss.on('connection', (ws, req) => {
     setupWSConnection(ws, req);
 });
-const crypto = require('crypto');
 
 var db = mysql.createConnection({
-    host: process.env.host,
-    user: process.env.user,
-    password: process.env.password,
-    database: process.env.database
+    host: process.env.HOST,
+    user: process.env.USERNAME,
+    password: process.env.PASSWORD,
+    database: process.env.DATABASE
     });
 db.connect();
+
+// var db = mysql.createConnection({
+//     host: 'localhost',
+//     user: 'sunkue',
+//     password: 'Tjsrb123!@',
+//     database: 'myweapon'
+//     });
+// db.connect();
 
 app.use(cors());
 app.use(bodyParser.urlencoded({extended: true})); // post body 데이터 받아오기 위함
@@ -155,6 +165,7 @@ app.post('/headerData', (req, res) => {
 
 // 2. 똥 치우기 버튼 => 완성
 app.post('/clearPoo', (req, res) => {
+
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 
@@ -173,6 +184,31 @@ app.post('/clearPoo', (req, res) => {
 
             // 정상적으로 똥이 치워졌다면 success 리턴
             return res.json({result : 'success'});
+        });
+    });
+});
+
+
+// 25. 똥 개수 가져오기 => 완성
+app.post('/getPoo', (req, res) => {
+
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    // jwt 토큰 검증
+    jwt.verify(token, secretKey, (error, decoded) => {
+        if(error) {
+            return res.json({result : 'fail'})
+        }
+        console.log(`토큰 검증 완료, 사용자 id : ${decoded.id}`);
+
+        let sql = `SELECT days FROM poo WHERE bakjoon_id=?`;
+        db.query(sql, [decoded.id], function(error, result) {
+            if(error) {
+                return res.json({result : 'fail'});
+            }
+            
+            return res.json({result : 'success', poo : result[0].days})
         });
     });
 });
@@ -286,7 +322,7 @@ app.post('/myPage', (req, res) => {
 
 
 
-    app.post('/runCode', (req, res) => {
+app.post('/runCode', (req, res) => {
 
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
@@ -469,6 +505,56 @@ app.post('/gambling', (req, res) => {
 });
 
 
+// 11. 코드리뷰 로비 입장 시 방목록 뿌려주기
+app.post('/reviewList', (req, res) => {
+
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    // jwt 토큰 검증
+    jwt.verify(token, secretKey, (error, decoded) => {
+        if(error) {
+            return res.json({result : 'fail'});
+        }
+        console.log(`토큰 검증 완료, 사용자 id : ${decoded.id}`);
+
+        
+        // 방번호, 방제목 조회
+        let sql = `SELECT review_id, room_title FROM review`;
+        db.query(sql, function(error, result) {
+            if(error) {
+                return res.json({result : 'fail', message : '쿼리 오류'});
+            }
+
+            let reviewIds = result.map(row => row.review_id);
+            let queries = reviewIds.map(review_id => {
+                return new Promise((resolve, reject) => {
+                    let countSql = `SELECT COUNT(*) AS count FROM your_table WHERE review_id = ?`;
+                    db.query(countSql, [review_id], (err, countResult) => {
+                        if (err) {
+                            return reject(err);
+                        }
+                        resolve({ review_id: review_id, count: countResult[0].count });
+                    });
+                });
+            });
+
+            Promise.all(queries)
+                .then(countResults => {
+                    res.json({ result: 'success', counts: countResults });
+                })
+                .catch(err => {
+                    res.json({ result: 'fail', message: '카운트 쿼리 오류', error: err });
+                });
+        });
+
+
+
+    });
+});
+
+
+
 
 // 채점 가능한 문제 보기
 app.post('/viewProblem', (req, res) => {
@@ -479,9 +565,9 @@ app.post('/viewProblem', (req, res) => {
     // jwt 토큰 검증
     jwt.verify(token, secretKey, (error, decoded) => {
         if(error) {
-            return res.json({result : 'fail'})
+            return res.json({result : 'fail'});
         }
-        console.log(`토큰 검증 완료, 사용자 id : ${decoded.id}`)
+        console.log(`토큰 검증 완료, 사용자 id : ${decoded.id}`);
 
         exec(`ls /home/ubuntu/nodejs/pokecode/testCase`, (error, stdout, stderr) => {
             if(error) {
@@ -627,6 +713,6 @@ function callApi() {
 }
 ////////////////////////////////////////////////// deepseek AI ////////////////////////////////////////////////
 
-server.listen(process.env.PORT || 44444, () => {
-    console.log(`Server running on port:${process.env.PORT}`);
+server.listen(3000 || 44444, () => {
+    console.log(`Server running on port:3000`);
 });
