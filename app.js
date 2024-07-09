@@ -5,6 +5,8 @@ const cors = require('cors');
 // 실시간 협업 에디터
 const WebSocket = require('ws');
 const http = require('http');
+const dotenv = require('dotenv');
+dotenv.config();
 const { setupWSConnection } = require('y-websocket/bin/utils');
 
 const app = express();
@@ -27,10 +29,10 @@ wss.on('connection', (ws, req) => {
 });
 
 var db = mysql.createConnection({
-    host: process.env.HOST,
-    user: process.env.USERNAME,
+    host: process.env.DB_HOST,
+    user: process.env.DB_PASSWORD,
     password: process.env.PASSWORD,
-    database: process.env.DATABASE
+    database: process.env.DB_NAME
     });
 db.connect();
 
@@ -56,10 +58,10 @@ function getRandomNumber(min, max) {
 ////////////////////////////////////////////////// API 시작 ////////////////////////////////////////////////
 
 // 프론트에서 만든 리액트 페이지들
-app.get('/', (req, res) => {
-    // res.render('index');  // ./views/index.ejs 리턴
-    res.sendFile(path.join(__dirname, 'views', 'index.html'));
-});
+// app.get('/', (req, res) => {
+//     // res.render('index');  // ./views/index.ejs 리턴
+//     res.sendFile(path.join(__dirname, 'views', 'index.html'));
+// });
 
 
 // 내가 만든 백 로직 테스트 페이지
