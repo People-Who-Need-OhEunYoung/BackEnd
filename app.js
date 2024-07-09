@@ -57,14 +57,11 @@ function getRandomNumber(min, max) {
 
 ////////////////////////////////////////////////// API 시작 ////////////////////////////////////////////////
 
-// 프론트에서 만든 리액트 페이지들
-// app.get('/', (req, res) => {
-//     // res.render('index');  // ./views/index.ejs 리턴
-//     res.sendFile(path.join(__dirname, 'views', 'index.html'));
-// });
+//health check 지우지 말것
+app.get('/',(req,res)=>{ 
+    res.status(200);
+})
 
-
-// 내가 만든 백 로직 테스트 페이지
 
 // 무중단 배포 서버 프로필 확인 (check status)
 app.get('/status',(req,res)=>{
