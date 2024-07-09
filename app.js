@@ -13,7 +13,7 @@ const app = express();
 const bodyParser = require('body-parser');
 const mysql = require('mysql2');
 const jwt = require('jsonwebtoken');
-const secretKey = process.env.SECRETKEY;
+const secretKey = process.env.JWT_SECRET_KEY;
 const { exec } = require('child_process');  // app.js가 있는 경로를 기준으로 실행된다
 const https = require('follow-redirects').https;
 const path = require('path');
@@ -216,6 +216,29 @@ app.post('/getPoo', (req, res) => {
 });
 
 
+// 26. 닉네임 중복검사
+app.post('/checkNickName', (req, res) => {
+
+    const nickName = req.body.nickName;
+
+    // 닉네임 중복검사
+    let sql = `SELECT * FROM user WHERE nick_name=?`;
+    db.query(sql, [nickName], function(error, result) {
+        if(error) {
+            return res.json({result : 'fail', message : '쿼리 오류'});
+        }
+        if(result.length > 0) {
+            return res.json({result : 'fail', message : '중복된 닉네임입니다.'});
+        }
+        else {
+            return res.json({result : 'success', message : '사용 가능한 닉네임입니다.'});
+        }
+    });
+});
+
+
+
+
 // 4. 회원가입 ( 사용자, 똥, 도감 테이블 추가 ) => 완성
 app.post('/signUp', (req, res) => {
     const id = req.body.id;
@@ -227,50 +250,42 @@ app.post('/signUp', (req, res) => {
     db.query(sql, [id], function(error, result) {
         if(error) {
             return res.json({result : 'fail', message : '쿼리 오류'});
+            
         }
         if(result.length > 0) {
             return res.json({result : 'fail', message : '중복된 ID입니다.'});
         }
-    });
 
 
-    // 닉네임 중복검사
-    sql = `SELECT * FROM user WHERE nick_name=?`;
-    db.query(sql, [nickName], function(error, result) {
-        if(error) {
-            return res.json({result : 'fail', message : '쿼리 오류'});
-        }
-        if(result.length > 0) {
-            return res.json({result : 'fail', message : '중복된 닉네임입니다.'});
-        }
-    });
-
-    // 회원가입 - 사용자 테이블에 추가
-    const hashPw = crypto.createHash('sha256').update(pw).digest('hex');
-    const pok_id = getRandomNumber(1, 649);
-    sql = `INSERT INTO user (bakjoon_id, bakjoon_pw, nick_name, cur_poke_id, credit) VALUES (
-    ?, ?, ?, ?, ?
-    )`;
-    db.query(sql, [id, hashPw, nickName, pok_id, 100], function(error, result) {
-        if(error) {
-            return res.json({result : 'fail', message : '쿼리 오류'});
-        }
-        
-        // 회원가입 - 똥 테이블에 추가
-        sql = `INSERT INTO poo (bakjoon_id, days) VALUES (?, ?)`;
-        db.query(sql, [id, 0], function(error2, result2) {
+        // 회원가입 - 사용자 테이블에 추가
+        const hashPw = crypto.createHash('sha256').update(pw).digest('hex');
+        const pok_id = getRandomNumber(1, 649);
+        sql = `INSERT INTO user (bakjoon_id, bakjoon_pw, nick_name, cur_poke_id, credit) VALUES (
+        ?, ?, ?, ?, ?
+        )`;
+        db.query(sql, [id, hashPw, nickName, pok_id, 100], function(error, result) {
             if(error) {
                 return res.json({result : 'fail', message : '쿼리 오류'});
             }
+            
 
-            // 회원가입 - 도감 테이블에 추가
-            sql = `INSERT INTO book (bakjoon_id, poke_id, poke_Lv, poke_Exp) VALUES (?, ?, ?, ?)`;
-            db.query(sql, [id, pok_id, 1, 0], function(error3, result3) {
+            // 회원가입 - 똥 테이블에 추가
+            sql = `INSERT INTO poo (bakjoon_id, days) VALUES (?, ?)`;
+            db.query(sql, [id, 0], function(error2, result2) {
                 if(error) {
                     return res.json({result : 'fail', message : '쿼리 오류'});
                 }
+    
 
-                return res.json({result : 'success', message : '회원가입 성공'});
+                // 회원가입 - 도감 테이블에 추가
+                sql = `INSERT INTO book (bakjoon_id, poke_id, poke_Lv, poke_Exp) VALUES (?, ?, ?, ?)`;
+                db.query(sql, [id, pok_id, 1, 0], function(error3, result3) {
+                    if(error) {
+                        return res.json({result : 'fail', message : '쿼리 오류'});
+                    }
+    
+                    return res.json({result : 'success', message : '회원가입 성공'});
+                });
             });
         });
     });
@@ -507,6 +522,56 @@ app.post('/gambling', (req, res) => {
 });
 
 
+// // 11. 코드리뷰 로비 입장 시 방목록 뿌려주기
+// app.post('/reviewList', (req, res) => {
+
+//     const authHeader = req.headers['authorization'];
+//     const token = authHeader && authHeader.split(' ')[1];
+
+//     // jwt 토큰 검증
+//     jwt.verify(token, secretKey, (error, decoded) => {
+//         if(error) {
+//             return res.json({result : 'fail'});
+//         }
+//         console.log(`토큰 검증 완료, 사용자 id : ${decoded.id}`);
+
+        
+//         // 방번호, 방제목 조회
+//         let sql = `SELECT review_id, room_title FROM review`;
+//         db.query(sql, function(error, result) {
+//             if(error) {
+//                 return res.json({result : 'fail', message : '쿼리 오류'});
+//             }
+
+//             let reviewIds = result.map(row => row.review_id); // review_id 배열
+//             let queries = reviewIds.map(review_id => {
+//                 return new Promise((resolve, reject) => {
+//                     let countSql = `SELECT COUNT(*) AS count FROM reviewer WHERE review_id=?`;
+//                     db.query(countSql, [review_id], (err, countResult) => {
+//                         if (err) {
+//                             return reject(err);
+//                         }
+//                         resolve({ review_id: review_id, count: countResult[0].count });
+//                     });
+//                 });
+//             });
+
+//             Promise.all(queries)
+//             .then(countResults => {
+//                 res.json({ result: 'success', counts: countResults });
+//             })
+//             .catch(err => {
+//                 res.json({ result: 'fail', message: '인원 수 세기 쿼리 오류', error: err });
+//             });
+
+
+//             // 다음 쿼리
+
+//         });
+//     });
+// });
+
+
 // 11. 코드리뷰 로비 입장 시 방목록 뿌려주기
 app.post('/reviewList', (req, res) => {
 
@@ -520,7 +585,6 @@ app.post('/reviewList', (req, res) => {
         }
         console.log(`토큰 검증 완료, 사용자 id : ${decoded.id}`);
 
-        
         // 방번호, 방제목 조회
         let sql = `SELECT review_id, room_title FROM review`;
         db.query(sql, function(error, result) {
@@ -528,10 +592,10 @@ app.post('/reviewList', (req, res) => {
                 return res.json({result : 'fail', message : '쿼리 오류'});
             }
 
-            let reviewIds = result.map(row => row.review_id);
+            let reviewIds = result.map(row => row.review_id); // review_id 배열
             let queries = reviewIds.map(review_id => {
                 return new Promise((resolve, reject) => {
-                    let countSql = `SELECT COUNT(*) AS count FROM your_table WHERE review_id = ?`;
+                    let countSql = `SELECT COUNT(*) AS count FROM reviewer WHERE review_id=?`;
                     db.query(countSql, [review_id], (err, countResult) => {
                         if (err) {
                             return reject(err);
@@ -542,19 +606,108 @@ app.post('/reviewList', (req, res) => {
             });
 
             Promise.all(queries)
-                .then(countResults => {
-                    res.json({ result: 'success', counts: countResults });
+            .then(countResults => {
+                // 각 review_id에 대한 master 정보 조회
+                let masterQueries = reviewIds.map(review_id => {
+                    return new Promise((resolve, reject) => {
+                        let masterSql = `SELECT bakjoon_id FROM reviewer WHERE review_id=? AND is_master=1`;
+                        db.query(masterSql, [review_id], (err, masterResult) => {
+                            if (err) {
+                                return reject(err);
+                            }
+                            let masterId = masterResult.length > 0 ? masterResult[0].bakjoon_id : null;
+                            resolve({ review_id: review_id, master: masterId });
+                        });
+                    });
+                });
+
+                Promise.all(masterQueries)
+                .then(masterResults => {
+                    // countResults와 masterResults를 합침
+                    let finalResults = countResults.map(countResult => {
+                        let masterResult = masterResults.find(m => m.review_id === countResult.review_id);
+                        return {
+                            review_id: countResult.review_id,
+                            count: countResult.count,
+                            master: masterResult ? masterResult.master : null
+                        };
+                    });
+                    res.json({ result: 'success', reviews: finalResults });
                 })
                 .catch(err => {
-                    res.json({ result: 'fail', message: '카운트 쿼리 오류', error: err });
+                    res.json({ result: 'fail', message: '마스터 정보 쿼리 오류', error: err });
                 });
-        });
 
+            })
+            .catch(err => {
+                res.json({ result: 'fail', message: '인원 수 세기 쿼리 오류', error: err });
+            });
+        });
+    });
+});
+
+
+// 13. 방 만들기 => 완성
+app.post('/createReview', (req, res) => {
+
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    // jwt 토큰 검증
+    jwt.verify(token, secretKey, (error, decoded) => {
+        if(error) {
+            return res.json({result : 'fail'});
+        }
+        console.log(`토큰 검증 완료, 사용자 id : ${decoded.id}`);
+
+
+        // 리뷰방 테이블에 추가
+        const roomTitle = req.body.reviewTitle;
+        const bojNumber = req.body.problemNo;
+        const bojTier = req.body.problemTier;
+        const bojTitle = req.body.problemTitle;
+        const maxPerson = req.body.maxPerson;
+
+        let sql = `INSERT INTO review (room_title, problem_no, problem_tier, problem_title, max_person) VALUES (?, ?, ?, ?, ?)`;
+        db.query(sql, [roomTitle, bojNumber, bojTier, bojTitle, maxPerson], function(error, result) {
+            if(error) {
+                return res.json({result : 'fail', message : '쿼리 오류'});
+            }
+
+            
+            // 리뷰어 테이블에 추가
+            sql = `INSERT INTO reviewer (review_id, bakjoon_id, is_master) VALUES (?, ?, ?)`;
+            db.query(sql, [result.insertId, decoded.id, 1], function(error2, result2) {
+                if(error) {
+                    return res.json({result : 'fail', message : '쿼리 오류'});
+                }
+                return res.json({result : 'success', message : '방 생성 완료'});
+            });
+        });
+    });
+});
+
+
+
+// 15. 테스트 케이스 추가
+app.post('/addTC', (req, res) => {
+
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    // jwt 토큰 검증
+    jwt.verify(token, secretKey, (error, decoded) => {
+        if(error) {
+            return res.json({result : 'fail'});
+        }
+        console.log(`토큰 검증 완료, 사용자 id : ${decoded.id}`);
+
+
+        // 테스트케이스 추가
 
 
     });
 });
-
 
 
 
@@ -623,96 +776,147 @@ app.post('/runCode', (req, res) => {
 });
 
 ////////////////////////////////////////////////// deepseek AI ////////////////////////////////////////////////
-app.get('/aiTest', function (req, res) {
-    console.log('deepseek테스트 들어옴');
-    callApi();
+// AI - 알고리즘 힌트
+app.post('/aiHint', (req, res) => {
+
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    // jwt 토큰 검증
+    jwt.verify(token, secretKey, (error, decoded) => {
+        if(error) {
+            return res.json({result : 'fail'});
+        }
+        console.log(`토큰 검증 완료, 사용자 id : ${decoded.id}`);
+    });
+
+    console.log('알고리즘 힌트 응답 수신 중...');
+    const number = req.body.bojNumber;
+    callApi(number)
+        .then(response => {
+            return res.json({result : 'success', message : 'AI 응답 수신', data : response});
+        })
+        .catch(error => {
+            return res.json({result : 'fail', message : 'AI 응답 수신 실패'});
+        });
 });
 
-// 스트리밍 성공. 바닐라버전임
-function callApi() {
-    let options = {
-        'method': 'POST',
-        'hostname': 'api.deepseek.com',
-        'path': '/chat/completions',
-        'headers': {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': 'Bearer sk-880772ade7984d4ba70c1fb1c62da44a'
-        },
-        'maxRedirects': 20
-    };
 
-    const req = https.request(options, (res) => {
-        res.on("data", (chunk) => {
-            let rawData = chunk.toString();
+app.post('/aiAlgoFeedBack', (req, res) => {
 
-            // 여러 줄의 데이터가 올 수 있으므로 줄 단위로 처리
-            const lines = rawData.split('\n');
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
 
-            lines.forEach(line => {
-                if (line.trim().startsWith('data: ')) {
-                    try {
-                        // "data:" 제거 및 앞뒤 공백 제거
-                        const jsonStr = line.replace(/^data:\s*/, '').trim();
+    // jwt 토큰 검증
+    jwt.verify(token, secretKey, (error, decoded) => {
+        if(error) {
+            return res.json({result : 'fail'});
+        }
+        console.log(`토큰 검증 완료, 사용자 id : ${decoded.id}`);
+    });
 
-                        // '[DONE]' 신호 확인
-                        if (jsonStr === '[DONE]') {
-                            console.log("스트림 완료 신호 받음");
-                            return;
+    console.log('deepseek테스트 들어옴');
+    const number = req.body.bojNumber;
+    callApi(number)
+        .then(response => {
+            return res.json({result : 'success', message : 'AI 응답 수신', data : response});
+        })
+        .catch(error => {
+            return res.json({result : 'fail', message : 'AI 응답 수신 실패'});
+        });
+});
+
+
+// AI - 알고리즘 힌트 함수
+function callApi(number) {
+    return new Promise((resolve, reject) => {
+        let options = {
+            'method': 'POST',
+            'hostname': 'api.deepseek.com',
+            'path': '/chat/completions',
+            'headers': {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': 'Bearer sk-880772ade7984d4ba70c1fb1c62da44a'
+            },
+            'maxRedirects': 20
+        };
+
+        const req = https.request(options, (res) => {
+            let rawData = '';
+
+            res.on("data", (chunk) => {
+                rawData += chunk.toString();
+            });
+
+            res.on("end", () => {
+                try {
+                    // 여러 줄의 데이터를 줄 단위로 처리
+                    const lines = rawData.split('\n');
+                    let finalContent = '';
+
+                    lines.forEach(line => {
+                        if (line.trim().startsWith('data: ')) {
+                            // "data:" 제거 및 앞뒤 공백 제거
+                            const jsonStr = line.replace(/^data:\s*/, '').trim();
+
+                            // '[DONE]' 신호 확인
+                            if (jsonStr === '[DONE]') {
+                                console.log("스트림 완료 신호 받음");
+                                return;
+                            }
+
+                            // JSON 파싱
+                            const chunkData = JSON.parse(jsonStr);
+
+                            // content에 접근
+                            const content = chunkData.choices[0]?.delta?.content;
+
+                            if (content) {
+                                finalContent += content; // 응답을 누적
+                            }
                         }
+                    });
 
-                        // JSON 파싱
-                        const chunkData = JSON.parse(jsonStr);
-
-                        // content에 접근
-                        const content = chunkData.choices[0]?.delta?.content;
-
-                        if (content) {
-                            process.stdout.write(content); // 줄바꿈 없이 즉시 출력
-                        }
-                    } catch (error) {
-                        console.error("데이터 처리 중 오류 발생:", error);
-                    }
+                    resolve(finalContent); // 최종 응답을 resolve
+                } catch (error) {
+                    reject("데이터 처리 중 오류 발생: " + error);
                 }
+            });
+
+            res.on("error", (error) => {
+                reject('Error in response: ' + error); // 에러 처리
             });
         });
 
-
-        res.on("end", () => {
-            console.log('Response has ended.'); // 응답 종료 로그
+        let postData = JSON.stringify({
+            "messages": [
+                {
+                    "content": "You are a helpful assistant",
+                    "role": "system"
+                },
+                {
+                    "content": `백준 ${number}번 문제 풀이법에 대한 힌트를 간략하게 5줄로 말해줘`,
+                    "role": "user"
+                }
+            ],
+            "model": "deepseek-coder",
+            "frequency_penalty": 0,
+            "max_tokens": 2048,
+            "presence_penalty": 0,
+            "stop": null,
+            "stream": true,
+            "temperature": 1,
+            "top_p": 1,
+            "logprobs": false,
+            "top_logprobs": null
         });
 
-        res.on("error", (error) => {
-            console.error('Error in response:', error); // 에러 처리
-        });
+        req.write(postData); // POST 데이터 쓰기
+        req.end(); // 요청 종료
     });
-
-    let postData = JSON.stringify({
-        "messages": [
-            {
-                "content": "You are a helpful assistant",
-                "role": "system"
-            },
-            {
-                "content": "백준 3055번 탈출 문제 풀이법에 대한 힌트를 간략하게 5줄로 말해줘",
-                "role": "user"
-            }
-        ],
-        "model": "deepseek-coder",
-        "frequency_penalty": 0,
-        "max_tokens": 2048,
-        "presence_penalty": 0,
-        "stop": null,
-        "stream": true,
-        "temperature": 1,
-        "top_p": 1,
-        "logprobs": false,
-        "top_logprobs": null
-    });
-
-    req.write(postData); // POST 데이터 쓰기
-    req.end(); // 요청 종료
 }
+
 ////////////////////////////////////////////////// deepseek AI ////////////////////////////////////////////////
 
 server.listen(process.env.PORT || 44444, () => {
