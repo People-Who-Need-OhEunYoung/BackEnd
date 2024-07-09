@@ -3,8 +3,8 @@ const cors = require('cors');
 // 실시간 협업 에디터
 const WebSocket = require('ws');
 const http = require('http');
-// const dotenv = require('dotenv');
-// dotenv.config();
+const dotenv = require('dotenv');
+dotenv.config();
 const { setupWSConnection } = require('y-websocket/bin/utils');
 
 const app = express();
@@ -25,10 +25,10 @@ wss.on('connection', (ws, req) => {
 const crypto = require('crypto');
 
 var db = mysql.createConnection({
-    host: process.env.IP,
-    user: process.env.USERNAME,
+    host: process.env.DB_HOST,
+    user: process.env.DB_PASSWORD,
     password: process.env.PASSWORD,
-    database: 'myweapon'
+    database: process.env.DB_NAME
     });
 db.connect();
 
