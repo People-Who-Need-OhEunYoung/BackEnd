@@ -23,7 +23,7 @@ wss.on('connection', (ws, req) => {
 const crypto = require('crypto');
 
 var db = mysql.createConnection({
-    host: 'localhost',
+    host: '52.79.197.126',
     user: 'sunkue',
     password: 'Tjsrb123!@',
     database: 'myweapon'
