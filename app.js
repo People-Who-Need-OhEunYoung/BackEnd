@@ -42,11 +42,11 @@ function getRandomNumber(min, max) {
 
 ////////////////////////////////////////////////// API 시작 ////////////////////////////////////////////////
 
-// 프론트에서 만든 리액트 페이지들
-// app.get('/', (req, res) => {
-//     // res.render('index');  // ./views/index.ejs 리턴
-//     res.sendFile(path.join(__dirname, 'views', 'index.html'));
-// });
+
+//health check 지우지 말것
+app.get('/',(req,res)=>{ 
+    res.status(200);
+})
 
 // 무중단 배포 서버 프로필 확인 (check status)
 app.get('/status',(req,res)=>{
@@ -170,8 +170,7 @@ app.post('/aiFeedBack', (req, res) => {
 
 
 
-// 서버 실행
-server.listen(3000 || 44444, () => {
-    console.log(`running on port:3000`);
+server.listen(process.env.PORT || 44444, () => {
+    console.log(process.env.PORT);
+    console.log(`Server running on port:${process.env.PROFILE}`);
 });
-// develop에 올릴 때 process.env.PORT로 바꾸기
