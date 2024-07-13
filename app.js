@@ -36,6 +36,12 @@ app.use(express.json());
 
 ////////////////////////////////////////////////// API 시작 ////////////////////////////////////////////////
 
+
+//health check 지우지 말것
+app.get('/',(req,res)=>{ 
+    res.status(200);
+})
+
 // 무중단 배포 서버 프로필 확인 (check status)
 app.get('/status',(req,res)=>{
     const serverProfile = process.env.PROFILES || 'No color set'
@@ -152,7 +158,6 @@ app.post('/aiAlgoFeedBack', (req, res) => {
 app.post('/aiFeedBack', (req, res) => {
     ai.aiFeedBack(req, res);
 });
-
 
 
 // 서버 실행
