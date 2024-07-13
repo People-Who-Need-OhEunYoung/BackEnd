@@ -33,12 +33,6 @@ wss.on('connection', (ws, req) => {
 app.use(cors());
 app.use(bodyParser.urlencoded({extended: true})); // post body 데이터 받아오기 위함
 app.use(express.json());
-//app.use(express.static(path.join(__dirname, 'views')));
-
-// min ~ max 사이 숫자 중 하나를 랜덤으로 고르는 함수
-function getRandomNumber(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
 
 ////////////////////////////////////////////////// API 시작 ////////////////////////////////////////////////
 
@@ -59,7 +53,7 @@ app.get('/sunq', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'indexx.html'));
 });
 
-// 0. 로그인
+// 0. 로그인 => 완성
 app.post('/login', (req, res) => {
     startPage.login(req, res);
 });
@@ -105,7 +99,6 @@ app.post('/book', (req, res) => {
 });
 
 // 9. 뽑기 => 완성
-// 수정사항 : 크레딧 0 아래로 안 내려가게 바꿔야 한다
 app.post('/gambling', (req, res) => {
     mainPage.gambling(req, res);
 });
@@ -167,9 +160,12 @@ app.post('/aiFeedBack', (req, res) => {
 });
 
 
+// 서버 실행
+// server.listen(3000 || 44444, () => {
+//     console.log(`running on port:3000`);
+// });
 
-
-
+// develop에 올릴 때 process.env.PORT로 바꾸기
 server.listen(process.env.PORT || 44444, () => {
     console.log(process.env.PORT);
     console.log(`Server running on port:${process.env.PROFILE}`);
