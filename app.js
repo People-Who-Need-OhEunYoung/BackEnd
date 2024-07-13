@@ -33,20 +33,8 @@ wss.on('connection', (ws, req) => {
 app.use(cors());
 app.use(bodyParser.urlencoded({extended: true})); // post body 데이터 받아오기 위함
 app.use(express.json());
-//app.use(express.static(path.join(__dirname, 'views')));
-
-// min ~ max 사이 숫자 중 하나를 랜덤으로 고르는 함수
-function getRandomNumber(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
 
 ////////////////////////////////////////////////// API 시작 ////////////////////////////////////////////////
-
-// 프론트에서 만든 리액트 페이지들
-// app.get('/', (req, res) => {
-//     // res.render('index');  // ./views/index.ejs 리턴
-//     res.sendFile(path.join(__dirname, 'views', 'index.html'));
-// });
 
 // 무중단 배포 서버 프로필 확인 (check status)
 app.get('/status',(req,res)=>{
@@ -59,7 +47,7 @@ app.get('/sunq', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'indexx.html'));
 });
 
-// 0. 로그인
+// 0. 로그인 => 완성
 app.post('/login', (req, res) => {
     startPage.login(req, res);
 });
@@ -105,7 +93,6 @@ app.post('/book', (req, res) => {
 });
 
 // 9. 뽑기 => 완성
-// 수정사항 : 크레딧 0 아래로 안 내려가게 바꿔야 한다
 app.post('/gambling', (req, res) => {
     mainPage.gambling(req, res);
 });
@@ -165,8 +152,6 @@ app.post('/aiAlgoFeedBack', (req, res) => {
 app.post('/aiFeedBack', (req, res) => {
     ai.aiFeedBack(req, res);
 });
-
-
 
 
 
