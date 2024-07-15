@@ -173,12 +173,12 @@ app.post('/aiFeedBack', (req, res) => {
 
 
 // 서버 실행
-// server.listen(3000 || 44444, () => {
-//     console.log(`running on port:3000`);
-// });
+server.listen(3000 || 44444, () => {
+    console.log(`running on port:3000`);
+});
 
 // develop에 올릴 때 process.env.PORT로 바꾸기
-server.listen(process.env.PORT || 44444, () => {
-    console.log(process.env.PORT);
-    console.log(`Server running on port:${process.env.PROFILE}`);
-});
+// server.listen(process.env.PORT || 44444, () => {
+//     console.log(process.env.PORT);
+//     console.log(`Server running on port:${process.env.PROFILE}`);
+// });
