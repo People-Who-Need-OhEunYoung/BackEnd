@@ -95,7 +95,7 @@ app.post('/getPoo', (req, res) => {
 });
 
 // 6. 도감 출력 => 완성
-app.post('/book', (req, res) => {
+app.get('/book', (req, res) => {
     mainPage.book(req, res);
 });
 
