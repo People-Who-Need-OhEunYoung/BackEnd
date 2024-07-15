@@ -24,6 +24,7 @@ const startPage = require('./lib/startPage');
 const myPage = require('./lib/myPage');
 const codeReview = require('./lib/codeReview');
 const codeEditor = require('./lib/codeEditor');
+const problemList = require('./lib/problemList');
 const ai = require('./lib/ai');
 
 wss.on('connection', (ws, req) => {
@@ -118,6 +119,11 @@ app.post('/changeNickName', (req, res) => {
     myPage.changeNickName(req, res);
 });
 
+// 31. 문제 출력
+app.get('/problemList', (req, res) => {
+    problemList.problemList(req, res);
+});
+
 // 11. 코드리뷰 로비 입장 시 방목록 뿌려주기
 app.post('/reviewList', (req, res) => {
     codeReview.reviewList(req, res);
@@ -128,10 +134,10 @@ app.post('/createReview', (req, res) => {
     codeReview.createReview(req, res);
 });
 
-// 15. 테스트 케이스 추가 ( 미완성, 작업필요 )
-app.post('/addTC', (req, res) => {
-    codeEditor.addTC(req, res);
-});
+// // 15. 테스트 케이스 추가 ( 미완성, 작업필요 ) => 프론트에서함
+// app.post('/addTC', (req, res) => {
+//     codeEditor.addTC(req, res);
+// });
 
 // 30. 채점 가능한 문제 보기
 app.post('/viewProblem', (req, res) => {
@@ -142,6 +148,12 @@ app.post('/viewProblem', (req, res) => {
 app.post('/runCode', (req, res) => {
     codeEditor.runCode(req, res);
 });
+
+app.post('/runCodeTest', (req, res) => {
+    codeEditor.runCodeTest(req, res);
+});
+
+
 
 // AI 수정사항 : 토큰 만료 시 질문할 수 없도록 수정해야 함
 // 27. AI - 알고리즘 힌트 => 완성
@@ -161,12 +173,12 @@ app.post('/aiFeedBack', (req, res) => {
 
 
 // 서버 실행
-// server.listen(3000 || 44444, () => {
-//     console.log(`running on port:3000`);
-// });
+server.listen(3000 || 44444, () => {
+    console.log(`running on port:3000`);
+});
 
 // develop에 올릴 때 process.env.PORT로 바꾸기
-server.listen(process.env.PORT || 44444, () => {
-    console.log(process.env.PORT);
-    console.log(`Server running on port:${process.env.PROFILE}`);
-});
+// server.listen(process.env.PORT || 44444, () => {
+//     console.log(process.env.PORT);
+//     console.log(`Server running on port:${process.env.PROFILE}`);
+// });
