@@ -2,26 +2,27 @@
 # $1 -> 사용자 코드 파일명
 # $2 -> 문제번호
 
+# .env 파일을 읽어들여 환경변수 설정
+if [ -f .env ]; then
+    export $(grep -v '^#' .env | xargs | tr -d '\r')
+fi
+
+# 문제번호 앞뒤 공백 및 개행문자 제거
+problem_id=$(echo "$2" | tr -d '\n' | tr -d ' ')
+
+# 문제번호 존재여부 확인을 위한 쿼리 실행
+sql="SELECT input_case, output_case FROM problem_tc WHERE id=$problem_id;"
+test_cases=$(mysql -h "$DB_HOST" -u "$DB_USERNAME" -p"$DB_PASSWORD" "$DB_NAME" -se "$sql")
+
+# 쿼리 결과가 비어있으면 문제번호가 존재하지 않는 것
+if [ -z "$test_cases" ]; then
+    echo "\"$problem_id\"번 문제는 채점할 수 없습니다. 테스트용 데이터가 존재하지 않습니다."
+    exit 0
+fi
 
 result=""
 i=1
 userCodePath="/home/ubuntu/nodejs/pokecode/userCode/$1"
-
-DB_HOST="localhost"
-DB_USER="sunkue"
-DB_PASS="Tjsrb123!@"
-DB_NAME="myweapon"
-
-# 문제번호 존재여부 확인을 위한 쿼리 실행
-sql="SELECT input_case, output_case FROM problem_tc WHERE id=$2;"
-test_cases=$(mysql -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" -se "$sql")
-
-# 쿼리 결과가 비어있으면 문제번호가 존재하지 않는 것
-if [ -z "$test_cases" ]; then
-    echo "\"$2\"번 문제는 채점할 수 없습니다. 테스트용 데이터가 존재하지 않습니다."
-    exit 0
-fi
-
 
 # 쿼리 결과를 한 줄씩 처리
 while IFS=$'\t' read -r input_case output_case; do
