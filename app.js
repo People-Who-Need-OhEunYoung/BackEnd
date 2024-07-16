@@ -150,6 +150,11 @@ app.post('/viewProblem', (req, res) => {
     codeEditor.viewProblem(req, res);
 });
 
+// 33. 문제 에디터 입장할 때 resolved 테이블에 데이터 추가
+app.post('/selectOrUpdateResolvedProblem', (req, res) => {
+    codeEditor.selectOrUpdateResolvedProblem(req, res);
+})
+
 // 17.1 코드 채점 => 완성
 app.post('/runCode', (req, res) => {
     codeEditor.runCode(req, res);
@@ -178,12 +183,12 @@ app.post('/aiFeedBack', (req, res) => {
 
 
 // 서버 실행
-// server.listen(3000 || 44444, () => {
-//     console.log(`running on port:3000`);
-// });
+server.listen(3000 || 44444, () => {
+    console.log(`running on port:3000`);
+});
 
 // develop에 올릴 때 process.env.PORT로 바꾸기
-server.listen(process.env.PORT || 44444, () => {
-    console.log(process.env.PORT);
-    console.log(`Server running on port:${process.env.PROFILE}`);
-});
+// server.listen(process.env.PORT || 44444, () => {
+//     console.log(process.env.PORT);
+//     console.log(`Server running on port:${process.env.PROFILE}`);
+// });
