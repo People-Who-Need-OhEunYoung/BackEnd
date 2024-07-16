@@ -150,6 +150,11 @@ app.post('/viewProblem', (req, res) => {
     codeEditor.viewProblem(req, res);
 });
 
+// 33. 문제 에디터 입장할 때 resolved 테이블에 데이터 추가
+app.post('/selectOrUpdateResolvedProblem', (req, res) => {
+    codeEditor.selectOrUpdateResolvedProblem(req, res);
+})
+
 // 17.1 코드 채점 => 완성
 app.post('/runCode', (req, res) => {
     codeEditor.runCode(req, res);
