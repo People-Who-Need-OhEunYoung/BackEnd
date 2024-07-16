@@ -155,15 +155,10 @@ app.post('/runCode', (req, res) => {
     codeEditor.runCode(req, res);
 });
 
-app.post('/runCodeTest', (req, res) => {
-    codeEditor.runCodeTest(req, res);
-});
-
-app.get('/setTime', (req, res) => {
+// 34. 경과시간, 제한시간 저장하는 API
+app.post('/setTime', (req, res) => {
     codeEditor.setTime(req, res);
-})
-
-
+});
 
 // AI 수정사항 : 토큰 만료 시 질문할 수 없도록 수정해야 함
 // 27. AI - 알고리즘 힌트 => 완성
