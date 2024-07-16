@@ -4,6 +4,7 @@
 
 result=""
 i=1
+all_correct=true  # 모든 테스트 케이스가 정답인지 확인하는 변수
 userCodePath="/home/ubuntu/nodejs/pokecode/userCode/$1"
 inputFilePath="/home/ubuntu/nodejs/pokecode/testCase/input_case.txt"
 outputFilePath="/home/ubuntu/nodejs/pokecode/testCase/output_case.txt"
@@ -43,12 +44,19 @@ while IFS=$'\t' read -r input_case output_case; do
             result+="$i번 케이스 결과 : $userResult\n기댓값 : $(cat $outputFilePath)\n정답입니다!\n\n"
         else
             result+="$i번 케이스 결과 : $userResult\n기댓값 : $(cat $outputFilePath)\n오답입니다.\n\n"
+            all_correct=false  # 오답이 있으면 false로 설정
         fi
     else
         result+="$i번 케이스 오류 발생: $userResult\n"
+        all_correct=false  # 오류가 있으면 false로 설정
     fi
 
     i=$((i+1))
 done <<< "$test_cases"
+
+# 모든 테스트 케이스가 정답인 경우 추가 메시지 출력
+if [ "$all_correct" = true ]; then
+    result+="[축하합니다. 정답입니다!!]\n"
+fi
 
 echo -e "$result"
