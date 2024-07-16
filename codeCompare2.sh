@@ -4,10 +4,10 @@
 
 result=""
 i=1
-userCodePath="/home/ubuntu/nodejs/pokecode/userCode/$1"
+userCodePath="/tmp/$1"
 encodedTestCaseJson=$2
-inputFilePath="/home/ubuntu/nodejs/pokecode/testCase/test_input_case.txt"
-outputFilePath="/home/ubuntu/nodejs/pokecode/testCase/test_output_case.txt"
+inputFilePath="/tmp/test_input_case.txt"
+outputFilePath="/tmp/test_output_case.txt"
 
 # JSON 문자열 디코딩
 testCaseJson=$(echo "$encodedTestCaseJson" | python3 -c "import sys, urllib.parse as ul; print(ul.unquote(sys.stdin.read()))")
