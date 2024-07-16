@@ -6,6 +6,8 @@ result=""
 i=1
 userCodePath="/home/ubuntu/nodejs/pokecode/userCode/$1"
 encodedTestCaseJson=$2
+inputFilePath="/home/ubuntu/nodejs/pokecode/testCase/test_input_case.txt"
+outputFilePath="/home/ubuntu/nodejs/pokecode/testCase/test_output_case.txt"
 
 # JSON 문자열 디코딩
 testCaseJson=$(echo "$encodedTestCaseJson" | python3 -c "import sys, urllib.parse as ul; print(ul.unquote(sys.stdin.read()))")
@@ -17,14 +19,18 @@ for testCase in $testCases; do
     input_case=$(echo "$testCase" | jq -r '.input_case')
     output_case=$(echo "$testCase" | jq -r '.output_case')
 
-    userResult=$(python3.11 "$userCodePath" <<< "$input_case" 2>&1)
+    # 입력값을 파일로 저장
+    echo -e "$input_case" > "$inputFilePath"
+    echo -e "$output_case" > "$outputFilePath"
+
+    userResult=$(python3.11 "$userCodePath" < "$inputFilePath" 2>&1)
     exitCode=$?
 
     if [ $exitCode -eq 0 ]; then
-        if [ "$userResult" == "$output_case" ]; then
-            result+="$i번 케이스 결과 : $userResult\n기댓값 : $output_case\n정답입니다!\n\n"
+        if [ "$userResult" == "$(cat $outputFilePath)" ]; then
+            result+="$i번 케이스 결과 : $userResult\n기댓값 : $(cat $outputFilePath)\n정답입니다!\n\n"
         else
-            result+="$i번 케이스 결과 : $userResult\n기댓값 : $output_case\n오답입니다.\n\n"
+            result+="$i번 케이스 결과 : $userResult\n기댓값 : $(cat $outputFilePath)\n오답입니다.\n\n"
         fi
     else
         result+="$i번 케이스 오류 발생: $userResult\n"
