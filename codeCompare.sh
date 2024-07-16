@@ -2,6 +2,12 @@
 # $1 -> 사용자 코드 파일명
 # $2 -> 문제번호
 
+result=""
+i=1
+userCodePath="/home/ubuntu/nodejs/pokecode/userCode/$1"
+inputFilePath="/home/ubuntu/nodejs/pokecode/testCase/input_case.txt"
+outputFilePath="/home/ubuntu/nodejs/pokecode/testCase/output_case.txt"
+
 # .env 파일을 읽어들여 환경변수 설정
 if [ -f .env ]; then
     export $(grep -v '^#' .env | xargs | tr -d '\r')
@@ -20,21 +26,23 @@ if [ -z "$test_cases" ]; then
     exit 0
 fi
 
-result=""
-i=1
-userCodePath="/home/ubuntu/nodejs/pokecode/userCode/$1"
-
 # 쿼리 결과를 한 줄씩 처리
 while IFS=$'\t' read -r input_case output_case; do
-    userResult=$(python3.11 "$userCodePath" <<< "$input_case" 2>&1) # 사용자 코드 실행
+
+    # 입/출력 케이스 파일로 저장
+    echo -e "$input_case" > "$inputFilePath"
+    echo -e "$output_case" > "$outputFilePath"
+
+    # 사용자 코드 실행
+    userResult=$(python3.11 "$userCodePath" < "$inputFilePath" 2>&1)
     exitCode=$?
 
     # 실행 중 오류났으면 오류메시지 출력
     if [ $exitCode -eq 0 ]; then
-        if [ "$userResult" == "$output_case" ]; then
-            result+="$i번 케이스 결과 : $userResult\n기댓값 : $output_case\n정답입니다!\n\n"
+        if [ "$userResult" == "$(cat $outputFilePath)" ]; then
+            result+="$i번 케이스 결과 : $userResult\n기댓값 : $(cat $outputFilePath)\n정답입니다!\n\n"
         else
-            result+="$i번 케이스 결과 : $userResult\n기댓값 : $output_case\n오답입니다.\n\n"
+            result+="$i번 케이스 결과 : $userResult\n기댓값 : $(cat $outputFilePath)\n오답입니다.\n\n"
         fi
     else
         result+="$i번 케이스 오류 발생: $userResult\n"

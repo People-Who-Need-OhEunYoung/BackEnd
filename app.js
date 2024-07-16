@@ -119,15 +119,21 @@ app.post('/changeNickName', (req, res) => {
     myPage.changeNickName(req, res);
 });
 
+// 32. 사용자가 푼 문제 + 획득 크레딧/경험치 및 기타정보 주기 => 완성
+app.get('/resolvedProblems', (req, res) => {
+    myPage.resolvedProblems(req, res);
+})
+
 // 31. 문제 출력
 app.get('/problemList', (req, res) => {
     problemList.problemList(req, res);
 });
 
 // 11. 코드리뷰 로비 입장 시 방목록 뿌려주기
-app.post('/reviewList', (req, res) => {
+app.get('/reviewList', (req, res) => {
     codeReview.reviewList(req, res);
 });
+
 
 // 13. 방 만들기 => 완성
 app.post('/createReview', (req, res) => {
@@ -139,7 +145,7 @@ app.post('/createReview', (req, res) => {
 //     codeEditor.addTC(req, res);
 // });
 
-// 30. 채점 가능한 문제 보기
+// 30. 채점 가능한 문제 보기 => 수정필요
 app.post('/viewProblem', (req, res) => {
     codeEditor.viewProblem(req, res);
 });
@@ -152,6 +158,10 @@ app.post('/runCode', (req, res) => {
 app.post('/runCodeTest', (req, res) => {
     codeEditor.runCodeTest(req, res);
 });
+
+app.get('/setTime', (req, res) => {
+    codeEditor.setTime(req, res);
+})
 
 
 
