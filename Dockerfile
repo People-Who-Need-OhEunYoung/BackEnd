@@ -6,7 +6,9 @@ COPY . .
 
 COPY package*.json ./
 
-RUN npm install
+RUN npm install 
+
+RUN apt-get update && apt-get install -y mysql-client
 
 ARG PROFILES
 
