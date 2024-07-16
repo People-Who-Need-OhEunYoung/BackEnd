@@ -5,9 +5,10 @@
 result=""
 i=1
 all_correct=true  # 모든 테스트 케이스가 정답인지 확인하는 변수
-userCodePath="/home/ubuntu/nodejs/pokecode/userCode/$1"
-inputFilePath="/home/ubuntu/nodejs/pokecode/testCase/input_case.txt"
-outputFilePath="/home/ubuntu/nodejs/pokecode/testCase/output_case.txt"
+userCodePath="/tmp/$1"
+inputFilePath="/tmp/input_case.txt"
+outputFilePath="/tmp/output_case.txt"
+
 
 # .env 파일을 읽어들여 환경변수 설정
 if [ -f .env ]; then
