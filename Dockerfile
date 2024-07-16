@@ -8,7 +8,8 @@ COPY package*.json ./
 
 RUN npm install 
 
-RUN apt-get update && apt-get install -y mysql-client
+RUN apt-get update
+RUN apt-get install -y mysql-client
 
 ARG PROFILES
 
