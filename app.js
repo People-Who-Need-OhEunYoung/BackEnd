@@ -69,7 +69,7 @@ app.post('/checkNickName', (req, res) => {
     startPage.checkNickName(req, res);
 });
 
-// 24. 토큰 검증
+// 24. 토큰 검증 => 완성
 app.post('/tokenTest', (req, res) => {
     startPage.tokenTest(req, res);
 });
@@ -139,11 +139,6 @@ app.get('/reviewList', (req, res) => {
 app.post('/createReview', (req, res) => {
     codeReview.createReview(req, res);
 });
-
-// // 15. 테스트 케이스 추가 ( 미완성, 작업필요 ) => 프론트에서함
-// app.post('/addTC', (req, res) => {
-//     codeEditor.addTC(req, res);
-// });
 
 // 30. 채점 가능한 문제 보기 => 수정필요
 app.post('/viewProblem', (req, res) => {
