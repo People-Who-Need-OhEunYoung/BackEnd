@@ -140,6 +140,17 @@ app.post('/createReview', (req, res) => {
     codeReview.createReview(req, res);
 });
 
+// 35. 해결 버튼 => 완성
+app.post('/complete', (req, res) => {
+    codeReview.complete(req, res);
+})
+
+// 36. 강퇴 버튼
+app.post('/kick', (req, res) => {
+    codeReview.kick(req, res);
+})
+
+
 // 30. 채점 가능한 문제 보기 => 수정필요
 app.post('/viewProblem', (req, res) => {
     codeEditor.viewProblem(req, res);
