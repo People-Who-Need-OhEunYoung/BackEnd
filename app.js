@@ -188,8 +188,8 @@ app.post('/aiAlgoFeedBack', (req, res) => {
 // 29. AI - 일반 코드 피드백 => 완성
 app.post('/aiFeedBack', (req, res) => {
     ai.aiFeedBack(req, res);
-});
 
+});
 
 // 서버 실행
 // server.listen(3000 || 44444, () => {

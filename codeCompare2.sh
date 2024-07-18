@@ -1,9 +1,5 @@
 #!/bin/bash
-# $1 -> 사용자 코드 파일명
-# $2 -> 추가 테스트 케이스 배열
 
-result=""
-i=1
 userCodePath="/tmp/$1"
 encodedTestCaseJson=$2
 inputFilePath="/tmp/test_input_case.txt"
@@ -12,10 +8,11 @@ outputFilePath="/tmp/test_output_case.txt"
 # JSON 문자열 디코딩
 testCaseJson=$(echo "$encodedTestCaseJson" | python3 -c "import sys, urllib.parse as ul; print(ul.unquote(sys.stdin.read()))")
 
-testCases=$(echo "$testCaseJson" | jq -c '.[]')
+result=""
+i=1
 
 # 각 테스트 케이스 처리
-for testCase in $testCases; do
+while read -r testCase; do
     input_case=$(echo "$testCase" | jq -r '.input_case')
     output_case=$(echo "$testCase" | jq -r '.output_case')
 
@@ -37,6 +34,6 @@ for testCase in $testCases; do
     fi
 
     i=$((i+1))
-done
+done < <(echo "$testCaseJson" | jq -c '.[]')
 
 echo -e "$result"
