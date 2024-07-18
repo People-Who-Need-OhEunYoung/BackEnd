@@ -130,10 +130,13 @@ app.get('/problemList', (req, res) => {
 });
 
 // 11. 코드리뷰 로비 입장 시 방목록 뿌려주기
+// app.get('/reviewList', (req, res) => {
+//     codeReview.reviewList(req, res);
+// });
+
 app.get('/reviewList', (req, res) => {
     codeReview.reviewList(req, res);
 });
-
 
 // 13. 방 만들기 => 완성
 app.post('/createReview', (req, res) => {
