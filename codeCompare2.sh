@@ -6,7 +6,7 @@ inputFilePath="/tmp/test_input_case.txt"
 outputFilePath="/tmp/test_output_case.txt"
 
 # JSON 문자열 디코딩
-testCaseJson=$(echo "$encodedTestCaseJson" | python3 -c "import sys, urllib.parse as ul; print(ul.unquote(sys.stdin.read()))")
+testCaseJson=$(echo "$encodedTestCaseJson" | python3 -c "import sys, urllib.parse as ul; print(ul.unquote(sys.stdin.read().encode('latin1').decode('utf-8')))")
 
 result=""
 i=1
