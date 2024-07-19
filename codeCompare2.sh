@@ -11,7 +11,7 @@ testCaseJson=$(echo "$encodedTestCaseJson" | python3 -c "import sys, urllib.pars
 result=""
 i=1
 
-# 각 테스트 케이스 처리
+# 각 테스트 케이스 처리.
 while read -r testCase; do
     input_case=$(echo "$testCase" | jq -r '.input_case')
     output_case=$(echo "$testCase" | jq -r '.output_case')
