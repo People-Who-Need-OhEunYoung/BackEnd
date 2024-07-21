@@ -99,6 +99,15 @@ app.get('/book', (req, res) => {
     mainPage.book(req, res);
 });
 
+
+
+// 37. 도감 출력 개선
+app.get('/bookbook', (req, res) => {
+    mainPage.bookbook(req, res);
+})
+
+
+
 // 9. 뽑기 => 완성
 app.post('/gambling', (req, res) => {
     mainPage.gambling(req, res);
