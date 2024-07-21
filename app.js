@@ -100,15 +100,13 @@ app.get('/book', (req, res) => {
 });
 
 
-
 // 37. 도감 출력 개선
-app.get('/bookbook', (req, res) => {
-    mainPage.bookbook(req, res);
-})
+// app.get('/bookbook', (req, res) => {
+//     mainPage.bookbook(req, res);
+// })
 
 
-
-// 9. 뽑기 => 완성
+// 9. 뽑기 => 완성  --> 전포 뽑기 로직으로 수정해야함.
 app.post('/gambling', (req, res) => {
     mainPage.gambling(req, res);
 });
@@ -200,7 +198,7 @@ app.post('/aiFeedBack', (req, res) => {
 
 });
 
-// 서버 실행
+// //서버 실행
 // server.listen(3000 || 44444, () => {
 //     console.log(`running on port:3000`);
 // });
