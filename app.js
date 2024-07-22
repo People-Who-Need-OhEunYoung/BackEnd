@@ -109,7 +109,7 @@ app.post('/gambling', (req, res) => {
 // 37. 전설의 포켓몬 뽑기 => 작업 진행 중
 app.post('/legendGambling', (req, res) => {
     mainPage.legendGambling(req, res);
-})
+});
 
 
 // 5. 마이페이지 입장 시 데이터 뿌려주기 => 완성
