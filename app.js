@@ -100,16 +100,17 @@ app.get('/book', (req, res) => {
 });
 
 
-// 37. 도감 출력 개선
-// app.get('/bookbook', (req, res) => {
-//     mainPage.bookbook(req, res);
-// })
-
-
 // 9. 뽑기 => 완성  --> 전포 뽑기 로직으로 수정해야함.
 app.post('/gambling', (req, res) => {
     mainPage.gambling(req, res);
 });
+
+
+// 37. 전설의 포켓몬 뽑기 => 작업 진행 중
+app.post('/legendGambling', (req, res) => {
+    mainPage.legendGambling(req, res);
+})
+
 
 // 5. 마이페이지 입장 시 데이터 뿌려주기 => 완성
 app.post('/myPage', (req, res) => {
