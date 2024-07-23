@@ -100,9 +100,9 @@ app.get('/book', (req, res) => {
 });
 
 
-// 9. 뽑기 => 완성  --> 전포 뽑기 로직으로 수정해야함.
-app.post('/gambling', (req, res) => {
-    mainPage.gambling(req, res);
+// 9. 포켓몬 id 받아서 book 등록 후 현재 포켓몬 설정 => 완성
+app.post('/evolution', (req, res) => {
+    mainPage.evolution(req, res);
 });
 
 
