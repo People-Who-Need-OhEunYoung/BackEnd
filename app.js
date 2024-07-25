@@ -1,6 +1,11 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const amqp = require('amqplib/callback_api');
+const createConnection = require('./lib/db2');
+const { v4: uuidv4 } = require('uuid');
+
+
 
 // 실시간 협업 에디터
 const WebSocket = require('ws');
@@ -199,13 +204,108 @@ app.post('/aiFeedBack', (req, res) => {
 
 });
 
-// //서버 실행
-// server.listen(3000 || 44444, () => {
-//     console.log(`running on port:3000`);
-// });
 
-// develop에 올릴 때 process.env.PORT로 바꾸기
-server.listen(process.env.PORT || 44444, () => {
-    console.log(process.env.PORT);
-    console.log(`Server running on port:${process.env.PROFILE}`);
+
+////////////////////////////////////////////////// Rabbit MQ 연결  나중에 정리 하겠슴////////////////////////////////////////////////
+// RabbitMQ 연결 및 채널 생성
+
+
+// function generateUuid() {
+//     return Math.random().toString() + Math.random().toString() + Math.random().toString();
+// }
+let currentQueue = 1; // 현재 큐 인덱스를 1로 초기화
+let channel = null;
+const amqpURL = 'amqp://myuser:mypassword@13.209.214.53';
+amqp.connect(amqpURL, (error0, connection) => { 
+    if (error0) {
+        throw error0;
+    }
+    connection.createChannel((error1, ch) => {
+        if (error1) {
+            throw error1;
+        }
+        channel = ch;
+        const queues = Array.from({ length: 15 }, (_, i) => `task_queue_${i + 1}`);
+        queues.forEach(queue => {
+            channel.assertQueue(queue, { durable: true });
+        });
+    });
 });
+
+app.post('/submit', async (req, res) => {
+    const { code, lang, bojNumber, elapsed_time, limit_time, testCase } = req.body;
+  
+    // 데이터베이스 연결
+    let conn;
+    try {
+        conn = await createConnection();
+
+        if (!code || !lang || !bojNumber) {
+            return res.status(400).json({ error: '필드 누락' });
+        }
+
+        let finalTestCase = testCase;
+
+        if (Array.isArray(testCase) && testCase.length === 0) { // 사용자 테케가 없는 경우 == 제출하기 버튼을 눌렀을 경우
+            // bojNumber에 해당하는 테스트 케이스 데이터를 가져옴
+            const [rows] = await conn.execute('SELECT input_case, output_case FROM `problem_tc` WHERE `id` = ?', [bojNumber]);
+            console.log("DB에서 꺼낸 테스트 케이스 개수 :", rows.length)
+            finalTestCase = rows.map(row => ({ input_case: row.input_case, output_case: row.output_case }));
+        
+        }
+
+        //console.log(finalTestCase);
+        const correlationId = uuidv4();
+
+        channel.assertQueue('', { exclusive: true }, (err, q) => {
+            if (err) {
+                throw err;
+            }
+            const replyQueue = q.queue;
+            const message = JSON.stringify({ code, lang, bojNumber, elapsed_time, limit_time, testCase: finalTestCase });
+            console.log(finalTestCase);
+            const queue = `task_queue_${currentQueue}`;
+
+            channel.sendToQueue(queue, Buffer.from(message), {
+                persistent: true,
+                correlationId: correlationId,
+                replyTo: replyQueue
+            });
+
+            console.log(" [x] Sent '%s' to %s", message, queue);
+
+            currentQueue = currentQueue < 15 ? currentQueue + 1 : 1;
+
+            channel.consume(replyQueue, (msg) => {
+                //console.log(msg)
+                if (msg && msg.properties.correlationId === correlationId) {
+                    res.status(200).json({ result: JSON.parse(msg.content.toString()) });
+                    channel.deleteQueue(replyQueue);
+                }
+            }, {
+                noAck: true
+            });
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: '서버 오류' });
+    } finally {
+        if (conn) conn.end();
+    }
+});
+////////////////////////////////////////////////// 우똥이가 추가했음 ////////////////////////////////////////////////////////////////
+
+
+
+
+
+//서버 실행
+server.listen(3000, () => {
+    console.log(`running on port:3000`);
+});
+
+// // develop에 올릴 때 process.env.PORT로 바꾸기
+// server.listen(process.env.PORT || 44444, () => {
+//     console.log(process.env.PORT);
+//     console.log(`Server running on port:${process.env.PROFILE}`);
+// });
