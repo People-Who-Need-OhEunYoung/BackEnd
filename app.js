@@ -16,6 +16,7 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
 // 리팩토링 코드 파일
+const { swaggerUi, swaggerDocument } = require('./lib/swagger');
 const mainPage = require('./lib/mainPage');
 const startPage = require('./lib/startPage');
 const myPage = require('./lib/myPage');
@@ -29,9 +30,11 @@ wss.on('connection', (ws, req) => {
     setupWSConnection(ws, req);
 });
 
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(cors());
 app.use(bodyParser.urlencoded({extended: true})); // post body 데이터 받아오기 위함
 app.use(express.json());
+
 
 ////////////////////////////////////////////////// API 시작 ////////////////////////////////////////////////
 
