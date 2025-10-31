@@ -1,3 +1,2 @@
 *.html linguist-vendored
-*.ts linguist-vendored
-*.tsx linguist-vendored
+*.tsp linguist-vendored
